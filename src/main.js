@@ -7,7 +7,7 @@ require('dotenv').config();
 const votingContract = Address.parse("Ef_bG7kFwT4lLusRCfMN_n2mY4X4Gsa-IT9tpcNKproRukpH");
 
 
-export async function getClientV2() {
+async function getClientV2() {
 
     // get the decentralized RPC endpoint
     const endpoint = await getHttpEndpoint();
@@ -16,7 +16,7 @@ export async function getClientV2() {
     return new TonClient({ endpoint });
 }
 
-export async function getClientV4() {
+async function getClientV4() {
 
     const endpoint = await getHttpV4Endpoint();
 
@@ -24,7 +24,7 @@ export async function getClientV4() {
     return new TonClient4({ endpoint });
 }
 
-export async function getTransactions(client, startPage = {fromLt: "0", hash: ""}) {
+async function getTransactions(client, startPage = {fromLt: "0", hash: ""}) {
 
     let toLt = null;
     let maxLt = new BigNumber(toLt ?? -1);
@@ -57,7 +57,7 @@ export async function getTransactions(client, startPage = {fromLt: "0", hash: ""
     return { allTxns, paging };
 }
 
-export function getAllVotes(transactions, proposalInfo) {
+function getAllVotes(transactions, proposalInfo) {
 
     let allVotes = {}
 
@@ -81,7 +81,7 @@ export function getAllVotes(transactions, proposalInfo) {
     return allVotes;
 }
 
-export async function getVotingPower(clientV4, proposalInfo, transactions, votingPower={}) {
+async function getVotingPower(clientV4, proposalInfo, transactions, votingPower={}) {
 
     let voters = Object.keys(getAllVotes(transactions, proposalInfo));
 
@@ -96,7 +96,7 @@ export async function getVotingPower(clientV4, proposalInfo, transactions, votin
     return votingPower;
 }
 
-export function calcProposalResult(votes, votingPower) {
+function calcProposalResult(votes, votingPower) {
 
     let sumVotes = {yes: new BigNumber(0), no: new BigNumber(0), abstain: new BigNumber(0)};
 
@@ -120,27 +120,27 @@ export function calcProposalResult(votes, votingPower) {
     return {yes: yesPct, no: noPct, abstain: abstainPct, totalWeight: totalWeights.toString()};
 }
 
-export async function getSnapshotBlock(client) {
+async function getSnapshotBlock(client) {
     const res = await client.callGetMethod(votingContract, 'proposal_snapshot_block');
     return Number(res.stack[0][1]);
 }
 
-export async function getStartDate(client) {
+async function getStartDate(client) {
     const res = await client.callGetMethod(votingContract, 'proposal_start_time');
     return Number(res.stack[0][1]);
 }
 
-export async function getEndDate(client) {
+async function getEndDate(client) {
     const res = await client.callGetMethod(votingContract, 'proposal_end_time');
     return Number(res.stack[0][1]);
 }
 
-export function getCurrentResults(transactions, votingPower, proposalInfo) {
+function getCurrentResults(transactions, votingPower, proposalInfo) {
     let votes = getAllVotes(transactions, proposalInfo);
     return calcProposalResult(votes, votingPower);
 }
 
-export async function getProposalInfo(client) {
+async function getProposalInfo(client) {
 
     return {
         startDate: await getStartDate(client),
@@ -160,6 +160,9 @@ async function test() {
 
     const proposalInfo = await getProposalInfo(client)
     console.log(proposalInfo);
+
+    let allVotes = getAllVotes(tx.allTxns, proposalInfo);
+    console.log(allVotes);
 
     let votingPower = await getVotingPower(clientV4, proposalInfo, tx.allTxns);
     console.log(votingPower)
