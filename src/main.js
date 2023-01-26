@@ -154,12 +154,7 @@ async function test() {
     const client = await getClientV2()
     const clientV4 = await getClientV4()
     // const clientV4 = new TonClient4({endpoint: process.env.TON_ENDPOINT_V4 || "https://mainnet-v4.tonhubapi.com"});
-
-    // let addr = Address.parse('Ef_bG7kFwT4lLusRCfMN_n2mY4X4Gsa-IT9tpcNKproRukpH')
-    // const res = await client.callGetMethod(addr, 'proposal_end_time');
-    // console.log(res)
-    // process.exit()
-
+    
     let tx = await getTransactions(client);
     console.log(tx)
 
