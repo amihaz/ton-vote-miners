@@ -4,10 +4,10 @@ const BigNumber = require('bignumber.js');
 const _ = require('lodash');
 require('dotenv').config();
 
-
 const votingContract = Address.parse("Ef_bG7kFwT4lLusRCfMN_n2mY4X4Gsa-IT9tpcNKproRukpH");
 
-async function getClientV2() {
+
+export async function getClientV2() {
 
     // get the decentralized RPC endpoint
     const endpoint = await getHttpEndpoint();
@@ -16,7 +16,7 @@ async function getClientV2() {
     return new TonClient({ endpoint });
 }
 
-async function getClientV4() {
+export async function getClientV4() {
 
     const endpoint = await getHttpV4Endpoint();
 
@@ -24,7 +24,7 @@ async function getClientV4() {
     return new TonClient4({ endpoint });
 }
 
-async function getTransactions(client, startPage = {fromLt: "0", hash: ""}) {
+export async function getTransactions(client, startPage = {fromLt: "0", hash: ""}) {
 
     let toLt = null;
     let maxLt = new BigNumber(toLt ?? -1);
@@ -57,7 +57,7 @@ async function getTransactions(client, startPage = {fromLt: "0", hash: ""}) {
     return { allTxns, paging };
 }
 
-function getAllVotes(transactions, proposalInfo) {
+export function getAllVotes(transactions, proposalInfo) {
 
     let allVotes = {}
 
@@ -81,7 +81,7 @@ function getAllVotes(transactions, proposalInfo) {
     return allVotes;
 }
 
-async function getVotingPower(clientV4, proposalInfo, transactions, votingPower={}) {
+export async function getVotingPower(clientV4, proposalInfo, transactions, votingPower={}) {
 
     let voters = Object.keys(getAllVotes(transactions, proposalInfo));
 
@@ -96,7 +96,7 @@ async function getVotingPower(clientV4, proposalInfo, transactions, votingPower=
     return votingPower;
 }
 
-function calcProposalResult(votes, votingPower) {
+export function calcProposalResult(votes, votingPower) {
 
     let sumVotes = {yes: new BigNumber(0), no: new BigNumber(0), abstain: new BigNumber(0)};
 
@@ -120,27 +120,27 @@ function calcProposalResult(votes, votingPower) {
     return {yes: yesPct, no: noPct, abstain: abstainPct, totalWeight: totalWeights.toString()};
 }
 
-async function getSnapshotBlock(client) {
+export async function getSnapshotBlock(client) {
     const res = await client.callGetMethod(votingContract, 'proposal_snapshot_block');
     return Number(res.stack[0][1]);
 }
 
-async function getStartDate(client) {
+export async function getStartDate(client) {
     const res = await client.callGetMethod(votingContract, 'proposal_start_time');
     return Number(res.stack[0][1]);
 }
 
-async function getEndDate(client) {
+export async function getEndDate(client) {
     const res = await client.callGetMethod(votingContract, 'proposal_end_time');
     return Number(res.stack[0][1]);
 }
 
-function getCurrentResults(transactions, votingPower, proposalInfo) {
+export function getCurrentResults(transactions, votingPower, proposalInfo) {
     let votes = getAllVotes(transactions, proposalInfo);
     return calcProposalResult(votes, votingPower);
 }
 
-async function getProposalInfo(client) {
+export async function getProposalInfo(client) {
 
     return {
         startDate: await getStartDate(client),
@@ -154,7 +154,7 @@ async function test() {
     const client = await getClientV2()
     const clientV4 = await getClientV4()
     // const clientV4 = new TonClient4({endpoint: process.env.TON_ENDPOINT_V4 || "https://mainnet-v4.tonhubapi.com"});
-    
+
     let tx = await getTransactions(client);
     console.log(tx)
 
